@@ -1,6 +1,12 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const test = ref(import.meta.env.VITE_API_URL)
+</script>
+
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <h1>This is an about pageeeee {{ test }}</h1>
   </div>
 </template>
 
