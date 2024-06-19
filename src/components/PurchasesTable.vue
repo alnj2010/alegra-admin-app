@@ -1,11 +1,12 @@
 <template>
     <v-data-table-server :itemsPerPageOptions="perPage" itemsPerPageText="Compras por pagina"
-        v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems" :items-length="totalItems"
-        :loading="loading" item-value="name" @update:options="loadItems">
+        no-data-text="No se ha realizado compras en el mercado" loading-text="Cargando compras..." v-model:items-per-page="itemsPerPage" :headers="headers"
+        :items="serverItems" :items-length="totalItems" :loading="loading" item-value="name"
+        @update:options="loadItems">
         <template v-slot:top>
             <v-toolbar flat>
                 <v-toolbar-title>Historial de compras en el Mercado</v-toolbar-title>
-               
+
             </v-toolbar>
         </template>
     </v-data-table-server>
