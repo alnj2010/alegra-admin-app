@@ -1,82 +1,75 @@
 <script setup>
 import { ref } from 'vue';
-const desserts = [
-  {
-    recipe: 'Frozen Yogurt',
-    is_delivered: false,
-  },
-  {
-    recipe: 'Jelly bean',
-    is_delivered: false,
-  },
-  {
-    recipe: 'KitKat',
-    is_delivered: false,
-  },
-]
+import getAllOrders from '@/services/getAllOrders'
+import generateOrder from '@/services/generateOrder'
 
-const FakeAPI = {
-  async fetch({ page, itemsPerPage, sortBy }) {
-    console.log({ page, itemsPerPage, sortBy })
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage
-        const end = start + itemsPerPage
-        const items = desserts.slice()
+const orderStatuses = [{ text: 'pediente', value: 'pending' }, { text: 'servido', value: 'delivered' }, { text: 'todas', value: 'all' }]
+const status = ref(orderStatuses[2]);
 
-        if (sortBy.length) {
-          const sortKey = sortBy[0].key
-          const sortOrder = sortBy[0].order
-          items.sort((a, b) => {
-            const aValue = a[sortKey]
-            const bValue = b[sortKey]
-            return sortOrder === 'desc' ? bValue - aValue : aValue - bValue
-          })
-        }
+const loading = ref(true);
 
-        const paginated = items.slice(start, end)
-
-        resolve({ items: paginated, total: items.length })
-      }, 500)
-    })
-  },
-}
-
-
-const itemsPerPage = ref(1);
+const itemsPerPage = ref(2);
 
 const headers = ref([
   {
     title: 'Plato',
-    align: 'start',
+    align: 'center',
     sortable: false,
     key: 'recipe',
   },
   {
     title: 'Status',
-    align: 'start',
+    align: 'center',
     sortable: false,
-    key: 'is_delivered',
+    key: 'status',
+  },
+  {
+    title: 'Fecha de orden',
+    align: 'center',
+    sortable: false,
+    key: 'date',
   },
 ]);
 
 const serverItems = ref([]);
-const loading = ref(true);
-const totalItems = ref(3);
 
-function loadItems({ page, itemsPerPage, sortBy }) {
-  console.log({ page, itemsPerPage, sortBy })
+const totalItems = ref(null);
+
+async function loadItems(options) {
   loading.value = true
-  FakeAPI.fetch({ page, itemsPerPage, sortBy }).then((res) => {
-    serverItems.value = res.items;
-    totalItems.value = res.total;
-    loading.value = false;
-  })
+  const payload = await getAllOrders({status: status.value, ...options  });
+  loading.value = false;
 
+  serverItems.value = payload.data;
+  totalItems.value = payload.total;
 }
+
+async function changeStatus() {
+
+  await loadItems({ page: 1, itemsPerPage: itemsPerPage.value })
+}
+
+async function order() {
+  await generateOrder();
+  await loadItems({ page: 1, itemsPerPage: itemsPerPage.value })
+}
+
 </script>
 <template>
-  <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems"
-    :items-length="totalItems" :loading="loading" :search="search" item-value="name"
-    @update:options="loadItems"></v-data-table-server>
+  <v-data-table-server :itemsPerPageOptions="[1, 5, 10]" itemsPerPageText="Items perpage"
+    v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems" :items-length="totalItems"
+    :loading="loading" :search="search" item-value="name" @update:options="loadItems">
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>My CRUD</v-toolbar-title>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-select label="ordenes" item-title="text" :items="orderStatuses" variant="underlined" v-model="status"
+          @update:modelValue="changeStatus"></v-select>
+        <v-btn class="mb-2" color="primary" dark @click="order">
+          generar orden
+        </v-btn>
+      </v-toolbar>
+    </template>
+  </v-data-table-server>
 </template>
