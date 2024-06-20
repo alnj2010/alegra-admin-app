@@ -1,8 +1,8 @@
 <template>
     <v-data-table-server :itemsPerPageOptions="perPage" itemsPerPageText="Ordenes por pagina"
-        no-data-text="No se han generado ordenes" loading-text="Cargando ordenes..."  v-model:items-per-page="itemsPerPage" :headers="headers"
-        :items="serverItems" :items-length="totalItems" :loading="loading" item-value="name"
-        @update:options="loadItems">
+        no-data-text="No se han generado ordenes" loading-text="Cargando ordenes..."
+        v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems" :items-length="totalItems"
+        :loading="loading" item-value="name" @update:options="loadItems">
         <template v-slot:top>
             <v-toolbar flat>
                 <v-toolbar-title class="d-flex justify-center">
@@ -49,6 +49,12 @@ async function loadItems(options) {
 
 
 const headers = ref([
+    {
+        title: 'Orden',
+        align: 'center',
+        sortable: false,
+        key: 'id',
+    },
     {
         title: 'Plato',
         align: 'center',

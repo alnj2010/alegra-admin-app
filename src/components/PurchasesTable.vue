@@ -33,6 +33,12 @@ async function loadItems(options) {
 
 
 const headers = ref([
+{
+        title: '#Factura',
+        align: 'center',
+        sortable: false,
+        key: 'id',
+    },
     {
         title: 'Ingrediente',
         align: 'center',

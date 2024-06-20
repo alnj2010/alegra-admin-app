@@ -1,0 +1,4 @@
+VITE_API_KITCHEN_URL="http://localhost:8000"
+VITE_API_STORE_URL="http://localhost:8001"
+VITE_API_KEY_STORE="api_key_dev"
+VITE_API_KEY_KITCHEN="api_key_dev"
